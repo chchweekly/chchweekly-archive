@@ -1,0 +1,9 @@
+{
+  "name": "chchweekly-archive",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SEO-friendly static archive for ChchWeekly on Cloudflare Pages",
+  "scripts": {
+    "build": "node build.mjs"
+  }
+}
