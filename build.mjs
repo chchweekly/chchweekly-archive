@@ -88,7 +88,10 @@ function issuePage(e, isLatest=false, index=true) {
     mainEntityOfPage:`${DOMAIN}/editions/${e.slug}/`,publisher:{'@type':'Organization',name:'ChchWeekly',url:MAIN},inLanguage:'en-NZ'
   }:null,content:`<div class="container"><div class="crumbs"><a href="/">Home</a> / <a href="/editions/">Editions</a> / ${escapeHTML(shortDate(e.date))}</div>
 <header class="issue-header"><p class="eyebrow">${isLatest?'This week in Christchurch':'ChchWeekly edition'}</p><h1>${escapeHTML(e.title)}</h1><p class="subhead">${escapeHTML(e.description)}</p><div class="meta">Published ${escapeHTML(slugDate(e.date))} · Ōtautahi Christchurch</div></header>
-<article class="article">${e.html}</article><div class="issue-footer"><a class="link" href="/editions/">← Browse past editions</a><a class="link" href="/latest/">Read the latest edition →</a></div>${signup()}</div>`});
+<article class="article">${e.html}</article><div class="issue-footer"><a class="link" href="/editions/">← Browse past editions</a>${e.slug === latest?.slug
+  ? `<a class="link" href="${MAIN}/perks">Explore Reader Perks →</a>`
+  : `<a class="link" href="/latest/">Read the latest edition →</a>`
+}</div>${signup()}</div>`});
 }
 for (const e of editions) write(`editions/${e.slug}/index.html`,issuePage(e));
 if (latest) {
