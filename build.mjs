@@ -53,6 +53,13 @@ nav{display:flex;align-items:center;gap:23px}nav a{text-decoration:none;color:va
 .crumbs{padding-top:27px;font-size:13px;color:var(--muted)}.crumbs a{color:var(--muted)}.issue-header{padding:30px 0 28px}.issue-header h1{font-size:clamp(33px,5vw,48px)}.issue-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:23px 0;border-top:1px solid var(--rule);margin-top:28px;font-size:14px}
 footer{border-top:1px solid var(--rule);margin-top:45px;background:var(--white);font-size:13px;color:var(--muted)}footer .container{padding:22px 0;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .empty{text-align:center;border:1px dashed #c7d6ca;border-radius:14px;padding:50px 22px;background:white;color:var(--muted)}.empty h2{margin:0 0 12px;color:var(--ink)}
+/* Sticky signup strip: available on every archive page without covering the article. */
+body{padding-bottom:calc(112px + env(safe-area-inset-bottom, 0px))}
+.cta{position:fixed;z-index:100;left:50%;bottom:12px;transform:translateX(-50%);width:min(850px, calc(100% - 28px));margin:0;padding:16px 48px 16px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px;border:1px solid #385346;box-shadow:0 10px 36px rgba(21,38,27,.22)}
+.cta-copy{min-width:0}.cta h2{font-family:Georgia,serif;font-size:20px;line-height:1.2;margin:0 0 5px}.cta p{font-size:13px;line-height:1.35;margin:0}.cta .button{flex-shrink:0;white-space:nowrap;padding:10px 14px}
+.cta-dismiss{position:absolute;top:6px;right:10px;border:0;background:transparent;color:#d6e5d9;font-size:22px;line-height:1;cursor:pointer;padding:5px 8px}
+.cta-dismiss:hover,.cta-dismiss:focus-visible{color:white}
+@media(max-width:640px){body{padding-bottom:calc(140px + env(safe-area-inset-bottom, 0px))}.cta{bottom:8px;width:calc(100% - 16px);padding:13px 30px 13px 14px;gap:10px}.cta h2{font-size:15px;margin:0;line-height:1.3}.cta p{display:none}.cta .button{font-size:12px;padding:9px 10px}.cta-dismiss{right:3px;top:2px;font-size:20px}}
 @media(max-width:640px){.container{width:min(100% - 28px,850px)}.topbar{min-height:70px}.brand{font-size:20px}nav{gap:11px}nav a{font-size:12px}.hero{padding:44px 0 27px}.card{padding:20px}.cta{padding:24px}.issue-footer{align-items:flex-start;flex-direction:column}footer .container{flex-direction:column;align-items:flex-start}}
 `;
 write('assets/site.css', css);
@@ -72,7 +79,7 @@ ${ld}</head><body>
 </a><nav aria-label="Main navigation"><a href="/latest/">Latest</a><a href="/editions/">Past editions</a><a href="${MAIN}/">Subscribe</a></nav></div></header>
 <main>${content}</main><footer><div class="container"><span>Made in Ōtautahi Christchurch · © ${new Date().getUTCFullYear()} ChchWeekly</span><span><a href="${MAIN}/">Main website</a> · <a href="${MAIN}/perks">Subscriber perks</a></span></div></footer></body></html>`;
 }
-function signup() {return `<section class="cta"><h2>Love knowing what's happening in Christchurch?</h2><p>Get the best local events, things to do and news straight to your inbox every Thursday. Free to subscribe.</p><a class="button" href="${MAIN}/">Get ChchWeekly free →</a></section>`;}
+function signup() {return `<section class="cta" aria-label="Subscribe to ChchWeekly"><div class="cta-copy"><h2>Love knowing what's happening in Christchurch?</h2><p>Get the best local events and news every Thursday — free to subscribe.</p></div><a class="button" href="${MAIN}/">Subscribe free →</a><button type="button" class="cta-dismiss" aria-label="Dismiss signup banner" onclick="this.closest('.cta').remove();document.body.style.paddingBottom='0'">×</button></section>`;}
 function card(e, featured=false) {
   return `<article class="card ${featured ? 'featured':''}">${featured?'<span class="label">Latest edition</span>':`<span class="label">${escapeHTML(shortDate(e.date))}</span>`}<h2><a class="title-link" href="/editions/${e.slug}/">${escapeHTML(e.title)}</a></h2><p>${escapeHTML(e.description)}</p><a class="link" href="/editions/${e.slug}/">Read edition →</a></article>`;
 }
@@ -82,16 +89,20 @@ ${latest ? card(latest,true) : `<div class="empty"><h2>Our archive is almost rea
 ${editions.length>1?`<h2 class="section-heading">Previous editions</h2>${editions.slice(1,5).map(e=>card(e)).join('')}<p style="margin:22px 0"><a class="link" href="/editions/">Browse all editions →</a></p>`:''}${signup()}</div>`;
 write('index.html',shell({title:'Christchurch Events & Weekly Newsletter Archive',description:'Explore the latest Christchurch events, weekend activities, local news and ChchWeekly newsletter editions.',canonical:`${DOMAIN}/`,content:rootContent,index:!!latest}));
 write('editions/index.html',shell({title:'Past Editions – Christchurch Events and Local News',description:'Browse previous ChchWeekly editions featuring Christchurch events, things to do, local headlines and subscriber news.',canonical:`${DOMAIN}/editions/`,content:`<div class="container"><section class="hero"><p class="eyebrow">All editions</p><h1>ChchWeekly archive</h1><p class="subhead">Catch up on events, local news and ideas for exploring Christchurch from previous weeks.</p></section>${editions.length?editions.map(e=>card(e)).join(''):'<div class="empty"><h2>No published editions yet</h2><p>We are adding our first issue soon.</p></div>'}${signup()}</div>`,index:!!latest}));
+// Keep archive warnings on old editions, not the newest dated issue or /latest/.
+function editionBody(e) {
+  if (e.slug !== latest?.slug) return e.html;
+  return e.html
+    .replace(/<p\b[^>]*class=["'][^"']*\bchch-archive-notice\b[^"']*["'][^>]*>[\s\S]*?<\/p>\s*/i, '')
+    .replace(/<aside\b[^>]*>\s*<strong>\s*From our archive:\s*<\/strong>[\s\S]*?<\/aside>\s*/i, '');
+}
 function issuePage(e, isLatest=false, index=true) {
   return shell({title:e.title, description:e.description, canonical:`${DOMAIN}/editions/${e.slug}/`,index,type:'article',structured:index?{
     '@context':'https://schema.org','@type':'BlogPosting',headline:e.title,description:e.description,datePublished:e.date,dateModified:e.updatedDate||e.date,
     mainEntityOfPage:`${DOMAIN}/editions/${e.slug}/`,publisher:{'@type':'Organization',name:'ChchWeekly',url:MAIN},inLanguage:'en-NZ'
   }:null,content:`<div class="container"><div class="crumbs"><a href="/">Home</a> / <a href="/editions/">Editions</a> / ${escapeHTML(shortDate(e.date))}</div>
 <header class="issue-header"><p class="eyebrow">${isLatest?'This week in Christchurch':'ChchWeekly edition'}</p><h1>${escapeHTML(e.title)}</h1><p class="subhead">${escapeHTML(e.description)}</p><div class="meta">Published ${escapeHTML(slugDate(e.date))} · Ōtautahi Christchurch</div></header>
-<article class="article">${e.html}</article><div class="issue-footer"><a class="link" href="/editions/">← Browse past editions</a>${e.slug === latest?.slug
-  ? `<a class="link" href="${MAIN}/perks">Explore Reader Perks →</a>`
-  : `<a class="link" href="/latest/">Read the latest edition →</a>`
-}</div>${signup()}</div>`});
+<article class="article">${editionBody(e)}</article><div class="issue-footer"><a class="link" href="/editions/">← Browse past editions</a>${e.slug === latest?.slug ? `<a class="link" href="${MAIN}/perks">Explore reader perks →</a>` : `<a class="link" href="/latest/">Read the latest edition →</a>`}</div>${signup()}</div>`});
 }
 for (const e of editions) write(`editions/${e.slug}/index.html`,issuePage(e));
 if (latest) {
