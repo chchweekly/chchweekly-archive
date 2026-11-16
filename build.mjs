@@ -67,7 +67,9 @@ function shell({title, description, canonical, content, index = true, type = 'we
 <meta property="og:type" content="${type}"><meta property="og:site_name" content="ChchWeekly">
 <meta property="og:title" content="${escapeHTML(title)}"><meta property="og:description" content="${escapeHTML(description)}"><meta property="og:url" content="${escapeHTML(canonical)}">
 ${ld}</head><body>
-<header class="site-header"><div class="container topbar"><a class="brand" href="/"><span class="brand-mark">C</span> CHCHWEEKLY</a><nav aria-label="Main navigation"><a href="/latest/">Latest</a><a href="/editions/">Past editions</a><a href="${MAIN}/">Subscribe</a></nav></div></header>
+<header class="site-header"><div class="container topbar"><a class="brand" href="/">
+<img src="https://storage.mlcdn.com/account_image/2001147/A4dqEDJbLrZnd0Eu2qaRUfGZlMdooWMzJFrjyXfj.png" alt="ChchWeekly" style="height:45px;width:auto;max-width:220px;display:block;">
+</a><nav aria-label="Main navigation"><a href="/latest/">Latest</a><a href="/editions/">Past editions</a><a href="${MAIN}/">Subscribe</a></nav></div></header>
 <main>${content}</main><footer><div class="container"><span>Made in Ōtautahi Christchurch · © ${new Date().getUTCFullYear()} ChchWeekly</span><span><a href="${MAIN}/">Main website</a> · <a href="${MAIN}/perks">Subscriber perks</a></span></div></footer></body></html>`;
 }
 function signup() {return `<section class="cta"><h2>Love knowing what's happening in Christchurch?</h2><p>Get the best local events, things to do and news straight to your inbox every Thursday. Free to subscribe.</p><a class="button" href="${MAIN}/">Get ChchWeekly free →</a></section>`;}
