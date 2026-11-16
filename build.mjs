@@ -68,7 +68,7 @@ function shell({title, description, canonical, content, index = true, type = 'we
 <meta property="og:title" content="${escapeHTML(title)}"><meta property="og:description" content="${escapeHTML(description)}"><meta property="og:url" content="${escapeHTML(canonical)}">
 ${ld}</head><body>
 <header class="site-header"><div class="container topbar"><a class="brand" href="/">
-<img src="https://storage.mlcdn.com/account_image/2001147/A4dqEDJbLrZnd0Eu2qaRUfGZlMdooWMzJFrjyXfj.png" alt="ChchWeekly" style="height:45px;width:auto;max-width:220px;display:block;">
+<img src="https://storage.mlcdn.com/account_image/2001147/A4dqEDJbLrZnd0Eu2qaRUfGZlMdooWMzJFrjyXfj.png" alt="ChchWeekly" style="width:165px;height:32px;object-fit:contain;object-position:left center;display:block;">
 </a><nav aria-label="Main navigation"><a href="/latest/">Latest</a><a href="/editions/">Past editions</a><a href="${MAIN}/">Subscribe</a></nav></div></header>
 <main>${content}</main><footer><div class="container"><span>Made in Ōtautahi Christchurch · © ${new Date().getUTCFullYear()} ChchWeekly</span><span><a href="${MAIN}/">Main website</a> · <a href="${MAIN}/perks">Subscriber perks</a></span></div></footer></body></html>`;
 }
