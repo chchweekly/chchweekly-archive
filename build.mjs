@@ -58,12 +58,12 @@ footer{border-top:1px solid var(--rule);margin-top:45px;background:var(--white);
 /* In-flow subscription cards are deliberately not sticky on archive listing or older editions. */
 .cta .cta-copy{min-width:0}.cta .cta-copy h2{margin:0 0 13px}
 .cta .cta-copy p{margin:0 0 19px}
-/* Light-touch social proof prompt before the archive introduction. */
-.join-banner{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:30px 0 0;padding:17px 21px;background:#eff4ec;border:1px solid #d9e5d7;border-radius:12px;color:var(--ink)}
+/* Social proof prompt placed after the archive introduction, before the edition cards. */
+.join-banner{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:0 0 24px;padding:17px 21px;background:#eff4ec;border:1px solid #d9e5d7;border-radius:12px;color:var(--ink)}
 .join-banner strong{font-size:16px}.join-banner .join-detail{font-size:14px;color:var(--muted);margin-top:2px}
 .join-banner .button{white-space:nowrap;background:var(--ink);color:#fff;font-size:13px}
 .join-banner .button:hover{background:var(--green)}
-.join-banner + .hero{padding-top:39px}
+.hero--with-banner{padding-bottom:16px}
 /* Only the newest newsletter gets a scroll-triggered floating CTA. */
 .cta-floating{position:fixed;z-index:100;left:50%;bottom:12px;transform:translateX(-50%);width:min(850px,calc(100% - 28px));margin:0;padding:16px 52px 16px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px;border:1px solid #385346;box-shadow:0 10px 36px rgba(21,38,27,.22)}
 .cta-floating[hidden]{display:none!important}
@@ -74,8 +74,8 @@ footer{border-top:1px solid var(--rule);margin-top:45px;background:var(--white);
 .cta-dismiss:hover,.cta-dismiss:focus-visible{color:white}
 body.has-floating-cta{padding-bottom:calc(112px + env(safe-area-inset-bottom, 0px))}
 @media(max-width:640px){
-  .join-banner{margin-top:18px;padding:16px;align-items:flex-start;gap:10px;flex-direction:column}
-  .join-banner + .hero{padding-top:31px}
+  .join-banner{margin:0 0 18px;padding:16px;align-items:flex-start;gap:10px;flex-direction:column}
+  .hero--with-banner{padding-bottom:12px}
   .join-banner .button{font-size:12px}
   .cta-floating{bottom:8px;width:calc(100% - 16px);padding:12px 38px 12px 14px;gap:10px}
   .cta-floating .cta-copy h2{font-size:15px;margin:0;line-height:1.28}
@@ -137,11 +137,12 @@ function card(e, featured=false) {
   return `<article class="card ${featured ? 'featured':''}">${featured?'<span class="label">Latest edition</span>':`<span class="label">${escapeHTML(shortDate(e.date))}</span>`}<h2><a class="title-link" href="/editions/${e.slug}/">${escapeHTML(e.title)}</a></h2><p>${escapeHTML(e.description)}</p><a class="link" href="/editions/${e.slug}/">Read edition →</a></article>`;
 }
 const latest = editions[0] || null;
-const rootContent = `<div class="container">${joinBanner()}<section class="hero"><p class="eyebrow">Christchurch, New Zealand · Local weekly guide</p><h1>Discover what's happening in Christchurch.</h1><p class="subhead">The best events, markets, live music, things to do and local stories — curated every Thursday by ChchWeekly.</p></section>
+const rootContent = `<div class="container"><section class="hero hero--with-banner"><p class="eyebrow">Christchurch, New Zealand · Local weekly guide</p><h1>Discover what's happening in Christchurch.</h1><p class="subhead">The best events, markets, live music, things to do and local stories — curated every Thursday by ChchWeekly.</p></section>
+${joinBanner()}
 ${latest ? card(latest,true) : `<div class="empty"><h2>Our archive is almost ready</h2><p>We are getting the latest ChchWeekly edition ready to read online.</p><a class="link" href="${MAIN}/">Subscribe to the newsletter →</a></div>`}
 ${editions.length>1?`<h2 class="section-heading">Previous editions</h2>${editions.slice(1,5).map(e=>card(e)).join('')}<p style="margin:22px 0"><a class="link" href="/editions/">Browse all editions →</a></p>`:''}${signup()}</div>`;
 write('index.html',shell({title:'Christchurch Events & Weekly Newsletter Archive',description:'Explore the latest Christchurch events, weekend activities, local news and ChchWeekly newsletter editions.',canonical:`${DOMAIN}/`,content:rootContent,index:!!latest}));
-write('editions/index.html',shell({title:'Past Editions – Christchurch Events and Local News',description:'Browse previous ChchWeekly editions featuring Christchurch events, things to do, local headlines and subscriber news.',canonical:`${DOMAIN}/editions/`,content:`<div class="container">${joinBanner()}<section class="hero"><p class="eyebrow">All editions</p><h1>ChchWeekly archive</h1><p class="subhead">Catch up on events, local news and ideas for exploring Christchurch from previous weeks.</p></section>${editions.length?editions.map(e=>card(e)).join(''):'<div class="empty"><h2>No published editions yet</h2><p>We are adding our first issue soon.</p></div>'}${signup()}</div>`,index:!!latest}));
+write('editions/index.html',shell({title:'Past Editions – Christchurch Events and Local News',description:'Browse previous ChchWeekly editions featuring Christchurch events, things to do, local headlines and subscriber news.',canonical:`${DOMAIN}/editions/`,content:`<div class="container"><section class="hero hero--with-banner"><p class="eyebrow">All editions</p><h1>ChchWeekly archive</h1><p class="subhead">Catch up on events, local news and ideas for exploring Christchurch from previous weeks.</p></section>${joinBanner()}${editions.length?editions.map(e=>card(e)).join(''):'<div class="empty"><h2>No published editions yet</h2><p>We are adding our first issue soon.</p></div>'}${signup()}</div>`,index:!!latest}));
 // Keep archive warnings on old editions, not the newest dated issue or /latest/.
 function editionBody(e) {
   if (e.slug !== latest?.slug) return e.html;
